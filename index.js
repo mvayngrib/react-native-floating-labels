@@ -11,19 +11,22 @@ import {
   View,
 } from 'react-native';
 
-var FloatingLabel  = React.createClass({
-  propTypes: {
-    ...TextInput.propTypes,
-    inputStyle: TextInput.propTypes.style,
-    labelStyle: Text.propTypes.style,
-    disabled: PropTypes.bool,
-    style: View.propTypes.style,
-  },
+var textPropTypes = Text.propTypes || View.propTypes
+var textInputPropTypes = TextInput.propTypes || textPropTypes
+var propTypes = {
+  ...textInputPropTypes,
+  inputStyle: textInputPropTypes.style,
+  labelStyle: textPropTypes.style,
+  disabled: PropTypes.bool,
+  style: View.propTypes.style,
+}
 
+var FloatingLabel  = React.createClass({
+  propTypes: propTypes,
 
   getInitialState () {
     var state = {
-      text: '',
+      text: this.props.value,
       dirty: !!this.props.value
     };
 
@@ -62,7 +65,7 @@ var FloatingLabel  = React.createClass({
   },
 
   _onBlur () {
-    if (this.state.text === '') {
+    if (!this.state.text) {
       this._animate(false)
       this.setState({dirty: false});
     }
@@ -72,15 +75,20 @@ var FloatingLabel  = React.createClass({
     }
   },
 
-  updateText(event) {
-    var text = event.nativeEvent.text;
 
-    this.setState({
-      text: text
-    });
+  onChangeText(text) {
+    this.setState({ text })
+    if (this.props.onChangeText) {
+      this.props.onChangeText(text)
+    }
+  },
+
+  updateText(event) {
+    var text = event.nativeEvent.text
+    this.setState({ text })
 
     if (this.props.onEndEditing) {
-      this.props.onEndEditing(arguments);
+      this.props.onEndEditing(event)
     }
   },
 
@@ -110,7 +118,7 @@ var FloatingLabel  = React.createClass({
         multiline: this.props.multiline,
         onBlur: this._onBlur,
         onChange: this.props.onChange,
-        onChangeText: this.props.onChangeText,
+        onChangeText: this.onChangeText,
         onEndEditing: this.updateText,
         onFocus: this._onFocus,
         onSubmitEditing: this.props.onSubmitEditing,
