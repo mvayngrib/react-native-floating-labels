@@ -143,7 +143,7 @@ var FloatingLabel  = React.createClass({
     return (
       <View style={elementStyles}>
         {this._renderLabel()}
-        <TextInput
+        <TextInput  underlineColorAndroid='transparent'
           {...props}
         >
         </TextInput>
