@@ -1,5 +1,6 @@
 'use strict';
-import React, { PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
+
 import {
   StyleSheet,
   TextInput,
@@ -7,8 +8,8 @@ import {
   Animated,
   Easing,
   Text,
-  Platform,
   View,
+  Platform
 } from 'react-native';
 
 var textPropTypes = Text.propTypes || View.propTypes
@@ -75,7 +76,6 @@ var FloatingLabel  = React.createClass({
     }
   },
 
-
   onChangeText(text) {
     this.setState({ text })
     if (this.props.onChangeText) {
@@ -129,6 +129,7 @@ var FloatingLabel  = React.createClass({
         style: [styles.input],
         testID: this.props.testID,
         value: this.props.value,
+        underlineColorAndroid: this.props.underlineColorAndroid // removes the default bottom border for android
       },
       elementStyles = [styles.element];
 
@@ -143,7 +144,7 @@ var FloatingLabel  = React.createClass({
     return (
       <View style={elementStyles} pointerEvents='none'>
         {this._renderLabel()}
-        <TextInput  underlineColorAndroid='transparent'
+        <TextInput
           {...props}
         >
         </TextInput>
@@ -152,33 +153,38 @@ var FloatingLabel  = React.createClass({
   },
 });
 
+var labelStyleObj = {
+  marginTop: 21,
+  paddingLeft: 9,
+  color: '#AAA',
+  position: 'absolute'
+}
+
+if (Platform.OS === 'web') {
+  labelStyleObj.pointerEvents = 'none'
+}
+
 var styles = StyleSheet.create({
   element: {
     position: 'relative'
   },
   input: {
-    height: 45,
+    height: 40,
     borderColor: 'gray',
     backgroundColor: 'transparent',
     justifyContent: 'center',
     borderWidth: 1,
     color: 'black',
-    fontSize: 18,
+    fontSize: 20,
     borderRadius: 4,
-    marginLeft: Platform.OS === 'android' ? -5 : 0,
-    // paddingLeft: 10,
+    paddingLeft: 10,
     marginTop: 20,
   },
-  label: {
-    marginTop: 21,
-    // paddingLeft: 9,
-    color: '#AAA',
-    position: 'absolute'
-  }
+  label: labelStyleObj
 })
 
 var cleanStyle = {
-  fontSize: 18,
+  fontSize: 20,
   top: 7
 }
 
