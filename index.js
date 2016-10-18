@@ -141,7 +141,7 @@ var FloatingLabel  = React.createClass({
     }
 
     return (
-      <View style={elementStyles}>
+      <View style={elementStyles} pointerEvents='none'>
         {this._renderLabel()}
         <TextInput  underlineColorAndroid='transparent'
           {...props}
@@ -171,7 +171,6 @@ var styles = StyleSheet.create({
   },
   label: {
     marginTop: 21,
-    pointerEvents: 'none',
     // paddingLeft: 9,
     color: '#AAA',
     position: 'absolute'
