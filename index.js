@@ -161,6 +161,10 @@ var labelStyleObj = {
   position: 'absolute'
 }
 
+if (Platform.OS === 'web') {
+  labelStyleObj.pointerEvents = 'none'
+}
+
 var styles = StyleSheet.create({
   element: {
     position: 'relative'
