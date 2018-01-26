@@ -13,11 +13,9 @@
     "floating-labels",
     "ios"
   ],
-  "dependencies": {
-    "lodash": "^3.8.0"
-  },
+  "dependencies": {},
   "scripts": {
-    "test": "echo 'Success'"  
+    "test": "echo 'Success'"
   },
   "author": "Mayank Patel",
   "license": "MIT"
