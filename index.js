@@ -171,7 +171,7 @@ var styles = StyleSheet.create({
     position: 'relative'
   },
   input: {
-    height: 40,
+    height: Platform.OS === 'android' ? 50 : 40,
     borderColor: 'gray',
     backgroundColor: 'transparent',
     justifyContent: 'center',
