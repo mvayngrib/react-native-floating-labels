@@ -13,7 +13,9 @@
     "floating-labels",
     "ios"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "prop-types": "^15.5"
+  },
   "scripts": {
     "test": "echo 'Success'"
   },

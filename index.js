@@ -1,5 +1,6 @@
 'use strict';
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types'
 
 import {
   StyleSheet,
@@ -9,41 +10,47 @@ import {
   Easing,
   Text,
   View,
+  ViewPropTypes,
   Platform
 } from 'react-native';
 
-var textPropTypes = Text.propTypes || View.propTypes
-var textInputPropTypes = TextInput.propTypes || textPropTypes
-var propTypes = {
+const textPropTypes = Text.propTypes || ViewPropTypes
+const textInputPropTypes = TextInput.propTypes || textPropTypes
+const propTypes = {
   ...textInputPropTypes,
   inputStyle: textInputPropTypes.style,
   labelStyle: textPropTypes.style,
   disabled: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
 }
 
-var FloatingLabel  = React.createClass({
-  propTypes: propTypes,
+class FloatingLabel extends Component {
+  static propTypes = {
+    disabled: PropTypes.bool,
+    style: Text.propTypes.style,
+  };
 
-  getInitialState () {
-    var state = {
+  constructor(props) {
+    super(props)
+
+    const state = {
       text: this.props.value,
       dirty: !!this.props.value
     };
 
-    var style = state.dirty ? dirtyStyle : cleanStyle
+    const style = state.dirty ? dirtyStyle : cleanStyle
     state.labelStyle = {
       fontSize: new Animated.Value(style.fontSize),
       top: new Animated.Value(style.top)
     }
 
-    return state
-  },
+    this.state = state
+  }
 
-  _animate(dirty) {
-    var nextStyle = dirty ? dirtyStyle : cleanStyle
-    var labelStyle = this.state.labelStyle
-    var anims = Object.keys(nextStyle).map(prop => {
+  _animate = (dirty) => {
+    const nextStyle = dirty ? dirtyStyle : cleanStyle
+    const labelStyle = this.state.labelStyle
+    const anims = Object.keys(nextStyle).map(prop => {
       return Animated.timing(
         labelStyle[prop],
         {
@@ -55,17 +62,17 @@ var FloatingLabel  = React.createClass({
     })
 
     Animated.parallel(anims).start()
-  },
+  }
 
-  _onFocus () {
+  _onFocus = () => {
     this._animate(true)
     this.setState({dirty: true})
     if (this.props.onFocus) {
       this.props.onFocus(arguments);
     }
-  },
+  }
 
-  _onBlur () {
+  _onBlur = () => {
     if (!this.state.text) {
       this._animate(false)
       this.setState({dirty: false});
@@ -74,25 +81,25 @@ var FloatingLabel  = React.createClass({
     if (this.props.onBlur) {
       this.props.onBlur(arguments);
     }
-  },
+  }
 
-  onChangeText(text) {
+  onChangeText = (text) => {
     this.setState({ text })
     if (this.props.onChangeText) {
       this.props.onChangeText(text)
     }
-  },
+  }
 
-  updateText(event) {
-    var text = event.nativeEvent.text
+  updateText = (event) => {
+    const text = event.nativeEvent.text
     this.setState({ text })
 
     if (this.props.onEndEditing) {
       this.props.onEndEditing(event)
     }
-  },
+  }
 
-  _renderLabel () {
+  _renderLabel = () => {
     return (
       <Animated.Text
         pointerEvents='none'
@@ -102,10 +109,10 @@ var FloatingLabel  = React.createClass({
         {this.props.children}
       </Animated.Text>
     )
-  },
+  }
 
   render() {
-    var props = {
+    const props = {
         autoCapitalize: this.props.autoCapitalize,
         autoCorrect: this.props.autoCorrect,
         autoFocus: this.props.autoFocus,
@@ -144,7 +151,7 @@ var FloatingLabel  = React.createClass({
     }
 
     return (
-  		<View style={elementStyles}>
+      <View style={elementStyles}>
         {this._renderLabel()}
         <TextInput
           {...props}
@@ -152,10 +159,10 @@ var FloatingLabel  = React.createClass({
         </TextInput>
       </View>
     );
-  },
-});
+  }
+}
 
-var labelStyleObj = {
+const labelStyleObj = {
   marginTop: 21,
   paddingLeft: 9,
   color: '#AAA',
@@ -166,7 +173,7 @@ if (Platform.OS === 'web') {
   labelStyleObj.pointerEvents = 'none'
 }
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   element: {
     position: 'relative'
   },
@@ -185,19 +192,14 @@ var styles = StyleSheet.create({
   label: labelStyleObj
 })
 
-var cleanStyle = {
+const cleanStyle = {
   fontSize: 20,
   top: 7
 }
 
-var dirtyStyle = {
+const dirtyStyle = {
   fontSize: 12,
   top: -17,
 }
 
-FloatingLabel.propTypes = {
-  disabled: PropTypes.bool,
-  style: Text.propTypes.style,
-};
-
-module.exports = FloatingLabel;
+export default FloatingLabel
