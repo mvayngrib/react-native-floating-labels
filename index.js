@@ -1,6 +1,7 @@
 'use strict';
 import React, {Component} from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 
 import {
   StyleSheet,
@@ -14,9 +15,9 @@ import {
   Platform
 } from 'react-native';
 
-const textPropTypes = Text.propTypes || ViewPropTypes
-const textInputPropTypes = TextInput.propTypes || textPropTypes
-const propTypes = {
+var textPropTypes = Text.propTypes || ViewPropTypes
+var textInputPropTypes = TextInput.propTypes || textPropTypes
+var propTypes = {
   ...textInputPropTypes,
   inputStyle: textInputPropTypes.style,
   labelStyle: textPropTypes.style,
@@ -24,33 +25,35 @@ const propTypes = {
   style: ViewPropTypes.style,
 }
 
-class FloatingLabel extends Component {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    style: Text.propTypes.style,
-  };
+var FloatingLabel  = createReactClass({
+  propTypes: propTypes,
 
-  constructor(props) {
-    super(props)
-
-    const state = {
+  getInitialState () {
+    var state = {
       text: this.props.value,
-      dirty: !!this.props.value
+      dirty: (this.props.value || this.props.placeholder)
     };
 
-    const style = state.dirty ? dirtyStyle : cleanStyle
+    var style = state.dirty ? dirtyStyle : cleanStyle
     state.labelStyle = {
       fontSize: new Animated.Value(style.fontSize),
       top: new Animated.Value(style.top)
     }
 
-    this.state = state
-  }
+    return state
+  },
 
-  _animate = (dirty) => {
-    const nextStyle = dirty ? dirtyStyle : cleanStyle
-    const labelStyle = this.state.labelStyle
-    const anims = Object.keys(nextStyle).map(prop => {
+  componentWillReceiveProps (props) {
+    if (typeof props.value !== 'undefined' && props.value !== this.state.text) {
+      this.setState({ text: props.value, dirty: !!props.value })
+      this._animate(!!props.value)
+    }
+  },
+
+  _animate(dirty) {
+    var nextStyle = dirty ? dirtyStyle : cleanStyle
+    var labelStyle = this.state.labelStyle
+    var anims = Object.keys(nextStyle).map(prop => {
       return Animated.timing(
         labelStyle[prop],
         {
@@ -62,17 +65,17 @@ class FloatingLabel extends Component {
     })
 
     Animated.parallel(anims).start()
-  }
+  },
 
-  _onFocus = () => {
+  _onFocus () {
     this._animate(true)
     this.setState({dirty: true})
     if (this.props.onFocus) {
       this.props.onFocus(arguments);
     }
-  }
+  },
 
-  _onBlur = () => {
+  _onBlur () {
     if (!this.state.text) {
       this._animate(false)
       this.setState({dirty: false});
@@ -81,25 +84,25 @@ class FloatingLabel extends Component {
     if (this.props.onBlur) {
       this.props.onBlur(arguments);
     }
-  }
+  },
 
-  onChangeText = (text) => {
+  onChangeText(text) {
     this.setState({ text })
     if (this.props.onChangeText) {
       this.props.onChangeText(text)
     }
-  }
+  },
 
-  updateText = (event) => {
-    const text = event.nativeEvent.text
+  updateText(event) {
+    var text = event.nativeEvent.text
     this.setState({ text })
 
     if (this.props.onEndEditing) {
       this.props.onEndEditing(event)
     }
-  }
+  },
 
-  _renderLabel = () => {
+  _renderLabel () {
     return (
       <Animated.Text
         pointerEvents='none'
@@ -109,10 +112,10 @@ class FloatingLabel extends Component {
         {this.props.children}
       </Animated.Text>
     )
-  }
+  },
 
   render() {
-    const props = {
+    var props = {
         autoCapitalize: this.props.autoCapitalize,
         autoCorrect: this.props.autoCorrect,
         autoFocus: this.props.autoFocus,
@@ -124,19 +127,23 @@ class FloatingLabel extends Component {
         enablesReturnKeyAutomatically: this.props.enablesReturnKeyAutomatically,
         keyboardType: this.props.keyboardType,
         multiline: this.props.multiline,
+        numberOfLines: this.props.numberOfLines,
         onBlur: this._onBlur,
         onChange: this.props.onChange,
         onChangeText: this.onChangeText,
         onEndEditing: this.updateText,
         onFocus: this._onFocus,
         onSubmitEditing: this.props.onSubmitEditing,
-        password: this.props.password,
+        password: this.props.secureTextEntry || this.props.password, // Compatibility
+        placeholder: this.props.placeholder,
+        secureTextEntry: this.props.secureTextEntry || this.props.password, // Compatibility
         returnKeyType: this.props.returnKeyType,
         selectTextOnFocus: this.props.selectTextOnFocus,
         selectionState: this.props.selectionState,
         style: [styles.input],
         testID: this.props.testID,
-        value: this.props.value,
+        // html <input> doesn't clear when you give it a null
+        value: this.state.text == null ? '' : this.state.text,
         underlineColorAndroid: this.props.underlineColorAndroid, // android TextInput will show the default bottom border
         onKeyPress: this.props.onKeyPress
       },
@@ -160,9 +167,9 @@ class FloatingLabel extends Component {
       </View>
     );
   }
-}
+});
 
-const labelStyleObj = {
+var labelStyleObj = {
   marginTop: 21,
   paddingLeft: 9,
   color: '#AAA',
@@ -173,7 +180,7 @@ if (Platform.OS === 'web') {
   labelStyleObj.pointerEvents = 'none'
 }
 
-const styles = StyleSheet.create({
+var styles = StyleSheet.create({
   element: {
     position: 'relative'
   },
@@ -192,14 +199,14 @@ const styles = StyleSheet.create({
   label: labelStyleObj
 })
 
-const cleanStyle = {
+var cleanStyle = {
   fontSize: 20,
   top: 7
 }
 
-const dirtyStyle = {
+var dirtyStyle = {
   fontSize: 12,
   top: -17,
 }
 
-export default FloatingLabel
+module.exports = FloatingLabel;
